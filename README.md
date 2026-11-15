@@ -1,50 +1,50 @@
 # Set up AWS services
 
-Collection de travaux pratiques pour apprendre à déployer et utiliser des services AWS de data engineering. Le dépôt rassemble des configurations Terraform, des scripts Python/PySpark, des requêtes SQL et des guides pas à pas.
+Hands-on labs for learning how to deploy and use AWS services for data engineering. This repository contains Terraform configurations, Python/PySpark scripts, SQL queries, and step-by-step guides.
 
-Chaque dossier correspond à un atelier avec son propre README. Les ateliers se lancent séparément : il n'existe pas de déploiement Terraform global à la racine.
+Each directory is a separate lab with its own README. Run labs independently: there is no repository-wide Terraform deployment at the root.
 
-## Les ateliers
+## Labs
 
-| Dossier | Objectif | Mise en œuvre |
+| Directory | Goal | Implementation |
 | --- | --- | --- |
-| [learn-terraform-get-started-aws](learn-terraform-get-started-aws/README.md) | Découvrir Terraform avec un bucket S3, son chiffrement et le blocage de l'accès public. | Terraform |
-| [athena](athena/README.md) | Déposer des données sur S3 et les interroger en SQL avec Athena. | Terraform et SQL |
-| [emr](emr/README.md) | Exécuter un traitement PySpark sur EMR et produire des fichiers Parquet sur S3. | Terraform, Python et shell |
-| [glue](glue/README.md) | Configurer un job ETL Glue et son catalogue de données. | Terraform et PySpark |
-| [lambda](lambda/README.md) | Construire une conversion CSV vers Parquet avec Lambda, S3 et Athena. | Terraform pour le bucket source, Python et étapes manuelles |
-| [kinesis/kinesis-datastreams](kinesis/kinesis-datastreams/README.md) | Créer un flux, envoyer des événements et lire les enregistrements. | AWS CLI ou CloudShell |
-| [lakeformation](lakeformation/README.md) | Appliquer des contrôles d'accès aux lignes et colonnes d'une table. | Console AWS |
-| [quicksight](quicksight/README.md) | Préparer un data lake S3/Glue/Athena et créer des visualisations QuickSight. | Terraform et configuration QuickSight |
-| [redshift](redshift/README.md) | Déployer Redshift Serverless avec un bucket S3 de staging. | Terraform |
-| [stepfunctions](stepfunctions/README.md) | Orchestrer un cluster EMR avec Step Functions et EventBridge. | Terraform et définition de workflow |
+| [learn-terraform-get-started-aws](learn-terraform-get-started-aws/README.md) | Get started with Terraform by creating an S3 bucket with encryption and public access blocking. | Terraform |
+| [athena](athena/README.md) | Store data in S3 and query it with Athena using SQL. | Terraform and SQL |
+| [emr](emr/README.md) | Run PySpark processing on EMR and write Parquet files to S3. | Terraform, Python, and shell |
+| [glue](glue/README.md) | Configure a Glue ETL job and its data catalog. | Terraform and PySpark |
+| [lambda](lambda/README.md) | Build a CSV-to-Parquet conversion pipeline using Lambda, S3, and Athena. | Terraform for the source bucket, Python, and manual setup |
+| [kinesis/kinesis-datastreams](kinesis/kinesis-datastreams/README.md) | Create a stream, send events, and read records. | AWS CLI or CloudShell |
+| [lakeformation](lakeformation/README.md) | Apply row-level and column-level access controls to a table. | AWS Console |
+| [quicksight](quicksight/README.md) | Prepare an S3/Glue/Athena data lake and create QuickSight visualizations. | Terraform and QuickSight setup |
+| [redshift](redshift/README.md) | Deploy Redshift Serverless with an S3 staging bucket. | Terraform |
+| [stepfunctions](stepfunctions/README.md) | Orchestrate an EMR cluster using Step Functions and EventBridge. | Terraform and a workflow definition |
 
-## Prérequis
+## Prerequisites
 
-- Un compte AWS et des droits adaptés à l'atelier choisi.
-- Git, Terraform et AWS CLI pour les ateliers qui les utilisent.
-- Une session AWS configurée dans le terminal.
-- Les données de démonstration nécessaires, préparées localement.
+- An AWS account with permissions appropriate for the selected lab.
+- Git, Terraform, and AWS CLI for labs that use them.
+- An authenticated AWS session in your terminal.
+- The required sample datasets, prepared locally.
 
-Les contraintes Terraform et les versions des providers varient selon les dossiers. Consultez les blocs `terraform` de l'atelier avant de l'initialiser ; certains demandent Terraform 1.10 ou supérieur.
+Terraform constraints and provider versions vary between directories. Check the lab's `terraform` blocks before initialization; some require Terraform 1.10 or later.
 
-## Démarrer un atelier Terraform
+## Run a Terraform lab
 
-Clonez le dépôt et entrez dans l'atelier choisi, par exemple celui consacré à S3 :
+Clone the repository and open the selected lab, for example the introductory S3 lab:
 
 ```bash
 git clone https://github.com/assabur/set-up-aws-services.git
 cd set-up-aws-services/learn-terraform-get-started-aws
 ```
 
-Vérifiez le compte AWS utilisé et les outils disponibles :
+Check your AWS identity and available tools:
 
 ```bash
 aws sts get-caller-identity
 terraform version
 ```
 
-Lisez le README de l'atelier, puis adaptez la région, les noms de buckets, les variables et les chemins de fichiers à votre environnement. Les noms de buckets S3 doivent être uniques globalement.
+Read the lab's README, then adjust the region, bucket names, variables, and file paths for your environment. S3 bucket names must be globally unique.
 
 ```bash
 terraform init
@@ -53,43 +53,43 @@ terraform plan
 terraform apply
 ```
 
-Examinez le plan avant de confirmer la création des ressources. Les opérations de chargement des données, les requêtes SQL et certaines configurations dans la console sont décrites dans chaque atelier.
+Review the plan before confirming resource creation. Each lab explains its data uploads, SQL queries, and any additional console configuration.
 
-Pour Glue, un exemple de variables est disponible :
+For Glue, an example variables file is available:
 
 ```bash
 cd ../glue
 cp terraform.tfvars.example local.auto.tfvars
 ```
 
-Adaptez ce fichier avant le déploiement. Les fichiers `*.auto.tfvars` sont ignorés par Git. Un fichier `terraform.tfvars` déjà présent est chargé automatiquement : vérifiez aussi son contenu et les éventuelles valeurs qui se recouvrent.
+Customize this file before deployment. Files matching `*.auto.tfvars` are ignored by Git. An existing `terraform.tfvars` file is also loaded automatically: review its contents and any overlapping values.
 
-## Données et fichiers locaux
+## Datasets and local files
 
-Les CSV et les fichiers de logs sont exclus de Git. Ils ne sont donc pas fournis après un clonage, même si les README des ateliers mentionnent des jeux d'exemple. Préparez des données synthétiques respectant les schémas décrits dans chaque guide.
+CSV files and logs are excluded from Git. They are not included in a fresh clone, even when individual lab guides mention sample datasets. Prepare synthetic data matching the schemas described in each guide.
 
-Certains ateliers attendent notamment les chemins suivants :
+Some labs expect the following local paths:
 
-| Atelier | Fichier local attendu |
+| Lab | Expected local file |
 | --- | --- |
 | EMR | `emr/data/hr-salary-data.csv` |
-| QuickSight | `quicksight/data/sales.csv`, ou le chemin défini par `csv_file_path` |
+| QuickSight | `quicksight/data/sales.csv`, or the path set through `csv_file_path` |
 | Redshift | `redshift/data/sales_sample.csv` |
-| Lake Formation | `lakeformation/data/orders.csv`, à charger manuellement |
+| Lake Formation | `lakeformation/data/orders.csv`, uploaded manually |
 
-Pour Athena, Glue et Lambda, suivez le guide de l'atelier pour les schémas, les emplacements S3 et le chargement des données.
+For Athena, Glue, and Lambda, follow the lab guide for schemas, S3 locations, and data uploads.
 
-L'atelier Step Functions référence `stepfunctions/scripts/salary_aggregations.py`, absent du dépôt. Avant de le déployer, fournissez ce script ou adaptez la référence ; l'atelier EMR contient un exemple dans `emr/scripts/salary_aggregations.py`.
+The Step Functions lab references `stepfunctions/scripts/salary_aggregations.py`, which is missing from the repository. Provide that script or update the reference before deploying. The EMR lab includes an example at `emr/scripts/salary_aggregations.py`.
 
-Le `.gitignore` exclut également les états Terraform et le dossier `.terraform/`. Les fichiers `*.tfvars` ordinaires ne sont pas tous ignorés : utilisez un fichier `local.auto.tfvars` pour vos paramètres locaux et gardez les identifiants AWS hors des fichiers du projet.
+The `.gitignore` also excludes Terraform state files and the `.terraform/` directory. Ordinary `*.tfvars` files are not all ignored: use `local.auto.tfvars` for local settings and keep AWS credentials out of project files.
 
-## Nettoyer les ressources
+## Clean up resources
 
-Les services créés peuvent générer des frais, notamment EMR et Redshift. Après l'exercice, lancez depuis le dossier de l'atelier :
+Deployed services can incur charges, especially EMR and Redshift. After completing a lab, run the following from its directory:
 
 ```bash
 terraform plan -destroy
 terraform destroy
 ```
 
-La destruction peut supprimer les données des buckets selon la configuration. Sauvegardez ce que vous souhaitez conserver. Supprimez aussi les ressources créées manuellement en suivant le README de l'atelier : Terraform ne les gère pas automatiquement.
+Depending on the configuration, destroying resources may delete bucket contents. Back up anything you need to retain. Follow the lab's README to remove resources created manually, since Terraform does not manage them automatically.
