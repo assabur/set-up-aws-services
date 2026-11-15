@@ -1,0 +1,81 @@
+Comment: An example of the Amazon States Language for running jobs on Amazon EMR
+StartAt: Create an EMR cluster
+QueryLanguage: JSONata
+States:
+  Create an EMR cluster:
+    Type: Task
+    Resource: arn:aws:states:::elasticmapreduce:createCluster.sync
+    Arguments:
+      Name: ExampleCluster
+      VisibleToAllUsers: true
+      ReleaseLabel: emr-5.26.0
+      Applications:
+        - Name: Hive
+      ServiceRole: StepFunctionsSample-EMRJobManagement-EMRServiceRole-d2bmrkIQbrtO
+      JobFlowRole: >-
+        StepFunctionsSample-EMRJobManagement-2fc53d1f-bd2f-4b4c-959d-43e155ad78c0-EMREc2InstanceProfile-UbrE16853CWc
+      LogUri: s3://stepfunctions-emrproject-335273834735-us-east-1/logs/
+      Instances:
+        KeepJobFlowAliveWhenNoSteps: true
+        InstanceFleets:
+          - Name: MyMasterFleet
+            InstanceFleetType: MASTER
+            TargetOnDemandCapacity: 1
+            InstanceTypeConfigs:
+              - InstanceType: m5.xlarge
+          - Name: MyCoreFleet
+            InstanceFleetType: CORE
+            TargetOnDemandCapacity: 1
+            InstanceTypeConfigs:
+              - InstanceType: m5.xlarge
+    Assign:
+      clusterId: '{% $states.result.ClusterId %}'
+    Next: Run first step
+  Run first step:
+    Type: Task
+    Resource: arn:aws:states:::elasticmapreduce:addStep.sync
+    Arguments:
+      ClusterId: '{% $clusterId %}'
+      Step:
+        Name: My first EMR step
+        ActionOnFailure: CONTINUE
+        HadoopJarStep:
+          Jar: command-runner.jar
+          Args:
+            - bash
+            - '-c'
+            - ls
+    Retry:
+      - ErrorEquals:
+          - States.ALL
+        IntervalSeconds: 1
+        MaxAttempts: 3
+        BackoffRate: 2
+    Next: Run second step
+  Run second step:
+    Type: Task
+    Resource: arn:aws:states:::elasticmapreduce:addStep.sync
+    Arguments:
+      ClusterId: '{% $clusterId %}'
+      Step:
+        Name: My second EMR step
+        ActionOnFailure: CONTINUE
+        HadoopJarStep:
+          Jar: command-runner.jar
+          Args:
+            - bash
+            - '-c'
+            - ls
+    Retry:
+      - ErrorEquals:
+          - States.ALL
+        IntervalSeconds: 1
+        MaxAttempts: 3
+        BackoffRate: 2
+    Next: Terminate Cluster
+  Terminate Cluster:
+    Type: Task
+    Resource: arn:aws:states:::elasticmapreduce:terminateCluster
+    Arguments:
+      ClusterId: '{% $clusterId %}'
+    End: true

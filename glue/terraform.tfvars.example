@@ -1,0 +1,23 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and modify the values as needed
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+# Project Configuration
+project_name = "glue-etl-demo"
+environment  = "dev"
+
+# Data Source Configuration
+s3_bucket_name     = "data-mentoring-dev-bucket"
+source_data_path   = "s3://data-mentoring-dev-bucket/salary-data.csv"
+output_data_path   = "s3://data-mentoring-dev-bucket/gold/"
+
+# Glue Catalog Configuration
+catalog_database_name = "human_resources"
+
+# Glue Job Configuration
+glue_version      = "4.0"
+worker_type       = "G.1X"    # Options: Standard, G.1X, G.2X
+number_of_workers = 2         # Minimum: 2, Maximum: 10
+job_timeout       = 60        # Timeout in minutes (1-2880)
